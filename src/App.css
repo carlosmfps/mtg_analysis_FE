@@ -7,13 +7,32 @@
   flex-direction: column;
   row-gap: 20px;
 }
+.queryResults {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow: auto;
+  background: rgb(72, 104, 232);
+  height: 80%;
+  width: 100%;
+}
 
-h1 {
-  margin: 10px;
-  font-size: 40px;
+.image {
+  padding: 0.5rem;
+  max-width: 14rem;
+}
+
+.colors {
+  justify-content: center;
 }
 
 .search {
+  vertical-align: middle;
+  height: 20%;
+}
+
+.searchInput {
   display: flex;
   gap: 10px;
   justify-content: space-between;
@@ -21,4 +40,9 @@ h1 {
 
 ul li {
   font-size: 20px;
-} 
+}
+
+ h1 {
+  margin: 10px;
+  font-size: 40px;
+}
