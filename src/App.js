@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { Heading, Input, Image, Button, Stack, RadioGroup, Radio, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb } from '@chakra-ui/react';
+import { Heading, Input, Image, Button, Stack, RadioGroup, Radio,SliderFilledTrack, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider,Slider, SliderTrack,SliderThumb, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb } from '@chakra-ui/react';
 
 import "./App.css";
 import axios from "axios";
@@ -10,6 +10,7 @@ function App() {
   const [colorRadioValue, setColorRadioValue] = useState('1');
   const [checkedItems, setCheckedItems] = useState([false, false, false, false, false]);
   const [sliderValues, setSliderValues] = useState([0, 20]);
+  const [costSlider, setCostSlider] = useState(0);
   const [imageLinksList, setImageLinksList] = useState([""]);
 
   let inputHandler = (e) => {
@@ -44,12 +45,29 @@ function App() {
 
   let responseConvertion = (response) => {
     let newLinks = [];
-    console.log(newLinks);
-    for (let i = 0; i < response.data.length; i = i + 1) {
+    let cardsLimit = 100;
+    if (response.data.cards.length < 100) {
+      cardsLimit = response.data.cards.length
+    }
+    for (let i = 0; i < cardsLimit; i = i + 1) {
       newLinks.push(response.data[i].image_link);
     }
     setImageLinksList(newLinks);
   };
+
+  let AboveAverageResponseConvertion = (response) => {
+    let newLinks = [];
+    let cardsLimit = 100;
+    //console.log(response.data.cards[1]);
+    console.log('the average is ' + response.data.calculated_average)
+    if (response.data.cards.length < 100) {
+      cardsLimit = response.data.cards.length
+    }
+    for (let i = 0; i < cardsLimit; i = i + 1) {
+      newLinks.push(response.data.cards[i].image_link);
+    }
+    setImageLinksList(newLinks);
+  }
 
   let onClickSearch = () => {
     switch (parseInt(radioValue)) {
@@ -73,6 +91,14 @@ function App() {
         console.log("seaching card with toughness greater than " + sliderValues[0] + " and less than " + sliderValues[1])
         axios.get('http://127.0.0.1:8000/cards/byToughness?gte=' + sliderValues[0] + '&lte=' + sliderValues[1]).then(response => responseConvertion(response));
         break;
+      case 6:
+        console.log("seaching card with power above average from color " + colorRadioValue)
+        axios.get('http://127.0.0.1:8000/cards/aboveAverage/byColor?color=' + colorRadioValue).then(response => AboveAverageResponseConvertion(response));
+        break;
+      case 7:
+        console.log("seaching card with power above average from color " + colorRadioValue)
+        axios.get('http://127.0.0.1:8000/cards/aboveAverage/byTotalCost?total_cost=' + costSlider).then(response => AboveAverageResponseConvertion(response));
+        break;
       default:
         console.log(radioValue)
     }
@@ -84,7 +110,7 @@ function App() {
         <div className="search">
           <div className="searchInput">
             <Input
-              placeholder="insert your search term"
+              placeholder="insert your search term or number when appliable"
               onChange={inputHandler}
             />
             <Button colorScheme='teal' variant='solid' onClick={onClickSearch}>
@@ -113,22 +139,28 @@ function App() {
                 <Checkbox isChecked={checkedItems[5]} onChange={(e) => { setCheckedItems([checkedItems[0], checkedItems[1], checkedItems[2], checkedItems[3], checkedItems[4], e.target.checked]) }}>Match All Colors</Checkbox>
               </Stack>
             </CheckboxGroup>
-            <RadioGroup onchange={setColorRadioValue} value={colorRadioValue}>
+            <RadioGroup onChange={setColorRadioValue} value={colorRadioValue}>
               <Stack className="colors" hidden={radioValue !== '6'} spacing={[1, 5]} direction={'row'}>
-                <Radio value='1'><Image src='https://gatherer.wizards.com/images/Redesign/White_Mana.png' alt='White' /></Radio>
-                <Radio value='2'><Image src='https://gatherer.wizards.com/images/Redesign/Blue_Mana.png' alt='Blue' /></Radio>
-                <Radio value='3'><Image src='https://gatherer.wizards.com/images/Redesign/Black_Mana.png' alt='Black' /></Radio>
-                <Radio value='4'><Image src='https://gatherer.wizards.com/images/Redesign/Red_Mana.png' alt='Red' /></Radio>
-                <Radio value='5'><Image src='https://gatherer.wizards.com/images/Redesign/Green_Mana.png' alt='Green' /></Radio>
+                <Radio value='W'><Image src='https://gatherer.wizards.com/images/Redesign/White_Mana.png' alt='White' /></Radio>
+                <Radio value='U'><Image src='https://gatherer.wizards.com/images/Redesign/Blue_Mana.png' alt='Blue' /></Radio>
+                <Radio value='B'><Image src='https://gatherer.wizards.com/images/Redesign/Black_Mana.png' alt='Black' /></Radio>
+                <Radio value='R'><Image src='https://gatherer.wizards.com/images/Redesign/Red_Mana.png' alt='Red' /></Radio>
+                <Radio value='G'><Image src='https://gatherer.wizards.com/images/Redesign/Green_Mana.png' alt='Green' /></Radio>
               </Stack>
             </RadioGroup>
-            <RangeSlider onChange={(val) => setSliderValues([val[0], val[1]])} hidden={radioValue !== '4' && radioValue !== '5' && radioValue !== '7'} defaultValue={[sliderValues[0], sliderValues[1]]} min={0} max={20} step={1}>
+            <RangeSlider onChange={(val) => setSliderValues([val[0], val[1]])} hidden={radioValue !== '4' && radioValue !== '5'} defaultValue={[sliderValues[0], sliderValues[1]]} min={0} max={20} step={1}>
               <RangeSliderTrack>
                 <RangeSliderFilledTrack />
               </RangeSliderTrack>
               <RangeSliderThumb index={0}>{sliderValues[0]}</RangeSliderThumb>
               <RangeSliderThumb index={1}>{sliderValues[1]}</RangeSliderThumb>
             </RangeSlider>
+            <Slider onChange={(val) => setCostSlider(val)} hidden={radioValue !== '7'} defaultValue={0} min={0} max={16} step={1}>
+              <SliderTrack>
+                <SliderFilledTrack/>
+              </SliderTrack>
+              <SliderThumb >{costSlider}</SliderThumb>
+            </Slider>
           </div>
         </div>
         <div className="queryResults">
