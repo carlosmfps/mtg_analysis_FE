@@ -46,8 +46,8 @@ function App() {
   let responseConvertion = (response) => {
     let newLinks = [];
     let cardsLimit = 100;
-    if (response.data.cards.length < 100) {
-      cardsLimit = response.data.cards.length
+    if (response.data.length < 100) {
+      cardsLimit = response.data.length
     }
     for (let i = 0; i < cardsLimit; i = i + 1) {
       newLinks.push(response.data[i].image_link);
