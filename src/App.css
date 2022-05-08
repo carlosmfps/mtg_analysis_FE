@@ -38,6 +38,37 @@
   justify-content: space-between;
 }
 
+.cardDisplay {
+  text-align: center;
+  display: block;
+}
+
+.cardDisplayTitle {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: bolder;
+}
+
+.selectedCardImage {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.textCloseCardDisplay {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+  font-size: 0.8rem;
+}
+
+.listSuggestion {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+}
+
 ul li {
   font-size: 20px;
 }

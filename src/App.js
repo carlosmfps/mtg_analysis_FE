@@ -12,6 +12,14 @@ function App() {
   const [sliderValues, setSliderValues] = useState([0, 20]);
   const [costSlider, setCostSlider] = useState(0);
   const [cardsList, setCardsList] = useState([""]);
+  const [selectedCard, setSelectedCard] = useState({});
+
+  const DISPLAY_LIST = 'list';
+  const DISPLAY_CARD = 'card';
+  const DISPLAY_GRAPH = 'graph';
+  
+  // let elementBeingDisplayed = DISPLAY_CARD;
+  const [onDisplay, setOnDisplay] = useState(DISPLAY_LIST);
 
   let inputHandler = (e) => {
     var lowerCase = e.target.value;
@@ -102,11 +110,94 @@ function App() {
       default:
         console.log(radioValue)
     }
+    setOnDisplay(DISPLAY_LIST);
   }
 
   let loadSingleCard = (cardId) => {
     console.log('Loading card: ' + cardId);
-    axios.get('http://127.0.0.1:8000/cards/byId?id=' + cardId).then(response => console.log(response.data));
+    axios.get('http://127.0.0.1:8000/cards/byId?id=' + cardId).then(response => {
+      setSelectedCard(response.data);
+      setOnDisplay(DISPLAY_CARD);
+      console.log(response.data)
+    });
+  }
+
+  let mainDisplay = () => {
+    let toDisplay = null;
+
+    if (onDisplay === DISPLAY_LIST) {
+      toDisplay = cardsList.map((cardInfo) => {
+        return <div>
+          <Tooltip label={cardInfo.name}>
+            <div onClick={() => loadSingleCard(cardInfo._id)} style={{cursor: 'pointer'}}>
+              <Image className="image" src={cardInfo.image_link_small}  />
+            </div>
+          </Tooltip>
+        </div>
+      });
+    }
+    else if(onDisplay === DISPLAY_CARD) {
+      toDisplay = buildCardDisplay(selectedCard);
+    }
+
+
+    return toDisplay;
+  }
+
+  let closeCardDisplay = () => {
+    setOnDisplay(DISPLAY_LIST);
+  }
+
+  let buildCardDisplay = (card) => {
+    return (
+    <div className="cardDisplay">
+      <p>Scroll down for card info.</p>
+      <p className="textCloseCardDisplay" onClick={closeCardDisplay}>(Back to result list)</p>
+      <br />
+      <h2 className="cardDisplayTitle">{card.name}</h2>
+      <Image className="selectedCardImage" src={card.image_link} />
+      <br />
+      <p>Name: {card.name}</p>
+      <p>Type: {card.type}</p>
+      <br />
+      <p>{card.oracle_text}</p>
+      <br />
+      {
+        card.power === undefined ?
+          ''
+          :
+          <p>Power: {card.power}</p>
+      }
+      {
+        card.toughness === undefined ?
+          ''
+          :
+          <p>Toughness: {card.toughness}</p>
+      }
+      {
+        card.metrics === undefined ?
+        ''
+        :
+        <div>
+          <br />
+          <p>Considering cards with same total mana cost and same colors:</p>
+          <p>There are {buildListSuggestion(card.metrics.more_power.equal_total_cost_and_colors)} more powerful cards you should check out.</p>
+          <p>There are {buildListSuggestion(card.metrics.more_toughness.equal_total_cost_and_colors)} tougher cards you should check out.</p>
+          <p>There are {buildListSuggestion(card.metrics.more_power_and_toughness.equal_total_cost_and_colors)} strictly better cards you should check out.</p>
+        </div>
+      }
+
+    </div>
+    );
+  }
+
+  const loadSuggestionList = (newList) => {
+    setCardsList(newList);
+    setOnDisplay(DISPLAY_LIST);
+  }
+
+  const buildListSuggestion = (suggestion) => {
+    return <span className="listSuggestion" onClick={() => loadSuggestionList(suggestion.cards)}>{suggestion.total}</span>
   }
 
   return (
@@ -170,15 +261,9 @@ function App() {
           </div>
         </div>
         <div className="queryResults">
-          {cardsList.map((cardInfo) => {
-            return <div>
-              <Tooltip label={cardInfo.name}>
-                <div onClick={() => loadSingleCard(cardInfo._id)} style={{cursor: 'pointer'}}>
-                  <Image className="image" src={cardInfo.image_link_small}  />
-                </div>
-              </Tooltip>
-            </div>
-          })}
+          {
+            mainDisplay()
+          }
         </div>
       </div>
     </ChakraProvider>
