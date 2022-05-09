@@ -130,7 +130,7 @@ function App() {
         return <div>
           <Tooltip label={cardInfo.name}>
             <div onClick={() => loadSingleCard(cardInfo._id)} style={{cursor: 'pointer'}}>
-              <Image className="image" src={cardInfo.image_link_small}  />
+              <Image className="image" src={cardInfo.image_link}  />
             </div>
           </Tooltip>
         </div>
@@ -151,11 +151,10 @@ function App() {
   let buildCardDisplay = (card) => {
     return (
     <div className="cardDisplay">
-      <p>Scroll down for card info.</p>
-      <p className="textCloseCardDisplay" onClick={closeCardDisplay}>(Back to result list)</p>
-      <br />
-      <h2 className="cardDisplayTitle">{card.name}</h2>
+      <p className="textCloseCardDisplay" onClick={closeCardDisplay}>Back</p>
+      
       <Image className="selectedCardImage" src={card.image_link} />
+      <h2 className="cardDisplayTitle">{card.name}</h2>
       <br />
       <p>Name: {card.name}</p>
       <p>Type: {card.type}</p>
