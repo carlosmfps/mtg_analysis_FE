@@ -1,5 +1,5 @@
 import { React, useState } from "react";
-import { Heading, Input, Image, Button, Stack, RadioGroup, Radio,SliderFilledTrack, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider,Slider, SliderTrack,SliderThumb, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb } from '@chakra-ui/react';
+import { Heading, Input, Image, Button, Stack, RadioGroup, Radio,SliderFilledTrack, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider,Slider, SliderTrack,SliderThumb, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Tooltip } from '@chakra-ui/react';
 
 import "./App.css";
 import axios from "axios";
@@ -11,7 +11,7 @@ function App() {
   const [checkedItems, setCheckedItems] = useState([false, false, false, false, false]);
   const [sliderValues, setSliderValues] = useState([0, 20]);
   const [costSlider, setCostSlider] = useState(0);
-  const [imageLinksList, setImageLinksList] = useState([""]);
+  const [cardsList, setCardsList] = useState([""]);
 
   let inputHandler = (e) => {
     var lowerCase = e.target.value;
@@ -44,19 +44,19 @@ function App() {
   };
 
   let responseConvertion = (response) => {
-    let newLinks = [];
+    let newCards = [];
     let cardsLimit = 100;
     if (response.data.length < 100) {
       cardsLimit = response.data.length
     }
     for (let i = 0; i < cardsLimit; i = i + 1) {
-      newLinks.push(response.data[i].image_link);
+      newCards.push(response.data[i]);
     }
-    setImageLinksList(newLinks);
+    setCardsList(newCards);
   };
 
   let AboveAverageResponseConvertion = (response) => {
-    let newLinks = [];
+    let newCards = [];
     let cardsLimit = 100;
     //console.log(response.data.cards[1]);
     console.log('the average is ' + response.data.calculated_average)
@@ -64,9 +64,9 @@ function App() {
       cardsLimit = response.data.cards.length
     }
     for (let i = 0; i < cardsLimit; i = i + 1) {
-      newLinks.push(response.data.cards[i].image_link);
+      newCards.push(response.data.cards[i]);
     }
-    setImageLinksList(newLinks);
+    setCardsList(newCards);
   }
 
   let onClickSearch = () => {
@@ -103,6 +103,12 @@ function App() {
         console.log(radioValue)
     }
   }
+
+  let loadSingleCard = (cardId) => {
+    console.log('Loading card: ' + cardId);
+    axios.get('http://127.0.0.1:8000/cards/byId?id=' + cardId).then(response => console.log(response.data));
+  }
+
   return (
     <ChakraProvider>
       <div className="main">
@@ -164,8 +170,14 @@ function App() {
           </div>
         </div>
         <div className="queryResults">
-          {imageLinksList.map((link) => {
-            return <div><Image className="image" src={link} /></div>
+          {cardsList.map((cardInfo) => {
+            return <div>
+              <Tooltip label={cardInfo.name}>
+                <div onClick={() => loadSingleCard(cardInfo._id)} style={{cursor: 'pointer'}}>
+                  <Image className="image" src={cardInfo.image_link_small}  />
+                </div>
+              </Tooltip>
+            </div>
           })}
         </div>
       </div>
