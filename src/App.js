@@ -1,5 +1,7 @@
 import { React, useState } from "react";
-import { Heading, Input, Image, Button, Stack, RadioGroup, Radio,SliderFilledTrack, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider,Slider, SliderTrack,SliderThumb, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Tooltip } from '@chakra-ui/react';
+import { Heading, Input, Image, Button, Stack, RadioGroup, Radio,SliderFilledTrack, ChakraProvider, CheckboxGroup, Checkbox, RangeSlider,Slider, SliderTrack,SliderThumb, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Tooltip, requiredChakraThemeKeys } from '@chakra-ui/react';
+
+import Chart from 'chart.js/auto';
 
 import "./App.css";
 import axios from "axios";
@@ -13,6 +15,7 @@ function App() {
   const [costSlider, setCostSlider] = useState(0);
   const [cardsList, setCardsList] = useState([""]);
   const [selectedCard, setSelectedCard] = useState({});
+  const [currentCharts, setCurrentCharts] = useState([]);
 
   const DISPLAY_LIST = 'list';
   const DISPLAY_CARD = 'card';
@@ -139,6 +142,13 @@ function App() {
     else if(onDisplay === DISPLAY_CARD) {
       toDisplay = buildCardDisplay(selectedCard);
     }
+    else if(onDisplay === DISPLAY_GRAPH) {
+      toDisplay = <section>
+        <div>
+          <canvas id="graph" width="800" height="400"></canvas>
+        </div>
+      </section>
+    }
 
 
     return toDisplay;
@@ -202,6 +212,75 @@ function App() {
     return <span className="listSuggestion" onClick={() => loadSuggestionList(suggestion.cards)}>{suggestion.total}</span>
   }
 
+  const displayColorSynergyGraph = () => {
+    console.log('ahoy!');
+    setOnDisplay(DISPLAY_GRAPH);
+    axios.get('http://localhost:8000/colors/compatibility')
+      .then(response => {
+
+        currentCharts.forEach(c => {console.log(c); c.destroy()} );
+
+        let combinations = [];
+        let cardsInCommon = [];
+        Object.keys(response.data).forEach(entry => {
+          combinations.push(entry);
+          cardsInCommon.push(response.data[entry]);
+        });
+
+        const data = {
+          labels: combinations,
+          datasets: [{
+            label: 'Cards in common',
+            backgroundColor: 'rgb(0, 0, 0)',
+            borderColor: 'rgb(255, 0, 0)',
+            color: 'rgb(255, 0, 0)',
+            data: cardsInCommon
+          }]
+        };
+
+        const config = {
+          type: 'bar',
+          data: data,
+          options: {
+            plugins: {
+              legend: {
+                labels: {
+                  color: 'white',
+                  font: {
+                    size: 18
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                ticks: {
+                  color: 'white'
+                }
+              },
+              x: {
+                ticks: {
+                  color: 'white',
+                  font: {
+                    size: 18
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        const tutorialChart = new Chart(
+          document.getElementById("graph"),
+          config
+        );
+
+        const newCharts = [tutorialChart];
+        setCurrentCharts(newCharts);
+
+      })
+  }
+
   return (
     <ChakraProvider>
       <div className="main">
@@ -262,7 +341,7 @@ function App() {
               <SliderThumb >{costSlider}</SliderThumb>
             </Slider>
             <p className="statsChoiceWrapper" hidden={radioValue !== '8'}>
-              <button className="statsChoice">Color synergy</button>
+              <button className="statsChoice" onClick={displayColorSynergyGraph}>Color synergy</button>
               <button className="statsChoice">Power distribution</button>
               <button className="statsChoice">Type distribution</button>
             </p>
