@@ -205,7 +205,7 @@ function App() {
   return (
     <ChakraProvider>
       <div className="main">
-        <Heading paddingTop={'4rem'}>MTG Card Analysis</Heading>
+        <Heading paddingTop={'2rem'}>MTG Card Analysis</Heading>
         <div className="search">
           <div className="searchInput">
             <Input
