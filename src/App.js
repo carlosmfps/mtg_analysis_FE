@@ -260,7 +260,7 @@ function App() {
           labels: combinations,
           datasets: [{
             label: 'Cards in common',
-            backgroundColor: 'rgb(0, 0, 0)',
+            backgroundColor: 'rgb(156, 175, 248)',
             borderColor: 'rgb(255, 0, 0)',
             color: 'rgb(255, 0, 0)',
             data: cardsInCommon
