@@ -245,8 +245,15 @@ function App() {
         let combinations = [];
         let cardsInCommon = [];
         Object.keys(response.data).forEach(entry => {
-          combinations.push(entry);
           cardsInCommon.push(response.data[entry]);
+
+          entry = entry.replace("W", "White");
+          entry = entry.replace("R", "Red");
+          entry = entry.replace("B", "Black");
+          entry = entry.replace("U", "Blue");
+          entry = entry.replace("G", "Green");
+          entry = entry.replace("-", "/");
+          combinations.push(entry);
         });
 
         const data = {
