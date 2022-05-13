@@ -21,6 +21,7 @@
 .image {
   padding: 0.5rem;
   max-width: 14rem;
+  border-radius: 15px;
 }
 
 .colors {
@@ -29,7 +30,7 @@
 
 .search {
   vertical-align: middle;
-  height: 20%;
+  height: 12%;
 }
 
 .searchInput {
@@ -80,7 +81,7 @@
 
 .statsChoiceWrapper {
   text-align: center;
-  margin-top: 25px;
+  margin-top: 5px;
 }
 
 .statsChoice {
