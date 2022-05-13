@@ -151,15 +151,18 @@ function App() {
   let buildCardDisplay = (card) => {
     return (
     <div className="cardDisplay">
-      <p className="textCloseCardDisplay" onClick={closeCardDisplay}>Back</p>
+      <p className="textCloseCardDisplay" onClick={closeCardDisplay}>X</p>
       
-      <Image className="selectedCardImage" src={card.image_link} />
       <h2 className="cardDisplayTitle">{card.name}</h2>
+      <Image className="selectedCardImage" src={card.image_link} />
       <br />
       <p><b>Name</b>: {card.name}</p>
       <p><b>Type</b>: {card.type}</p>
       <br />
-      <p>{card.oracle_text}</p>
+
+      {/* <p>{card.oracle_text}</p> */}
+      {card.keywords.length === 0 ? '' : <p><b>Keywords</b>: {card.keywords.join(", ")}</p>}
+
       <br />
       {
         card.power === undefined ?

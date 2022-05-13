@@ -50,6 +50,7 @@
   font-size: 3rem;
   margin: 20px;
   font-weight: bolder;
+  text-align: center;
 }
 
 .selectedCardImage {
@@ -66,7 +67,7 @@
   background: rgb(72, 104, 232);
   font-size: 0.8rem;
   margin:2%;
-  float: left;
+  float: right;
   padding: 0px 5px 2px;
   border-radius: 5px;
 }
