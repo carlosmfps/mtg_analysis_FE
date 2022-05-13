@@ -24,6 +24,31 @@ function App() {
   // let elementBeingDisplayed = DISPLAY_CARD;
   const [onDisplay, setOnDisplay] = useState(DISPLAY_LIST);
 
+  //  GRAPH TEMPLATES
+  const graphTemplates = {
+    colorSynergy: {
+      wrapper: <section>
+        <div>
+          <canvas id="synergyGraph" width="800" height="400"></canvas>;
+        </div>
+      </section>
+    },
+    powerDistribution: {
+      wrapper: <section>
+        <div>
+          <canvas id="powerGraphWhite" width="800" height="400"></canvas>;
+          <canvas id="powerGraphBlue" width="800" height="400"></canvas>;
+          <canvas id="powerGraphBlack" width="800" height="400"></canvas>;
+          <canvas id="powerGraphRed" width="800" height="400"></canvas>;
+          <canvas id="powerGraphGreen" width="800" height="400"></canvas>;
+        </div>
+      </section>
+    },
+    typeDistribution: {}
+  }
+  const [currentGraphDisplay, setCurrentGraphDisplay] = useState(graphTemplates.colorSynergy.wrapper);
+
+
   let inputHandler = (e) => {
     var lowerCase = e.target.value;
     setInputText(lowerCase);
@@ -143,11 +168,7 @@ function App() {
       toDisplay = buildCardDisplay(selectedCard);
     }
     else if(onDisplay === DISPLAY_GRAPH) {
-      toDisplay = <section>
-        <div>
-          <canvas id="graph" width="800" height="400"></canvas>
-        </div>
-      </section>
+      toDisplay = currentGraphDisplay;
     }
 
 
@@ -214,6 +235,7 @@ function App() {
 
   const displayColorSynergyGraph = () => {
     console.log('ahoy!');
+    setCurrentGraphDisplay(graphTemplates.colorSynergy.wrapper);
     setOnDisplay(DISPLAY_GRAPH);
     axios.get('http://localhost:8000/colors/compatibility')
       .then(response => {
@@ -270,15 +292,115 @@ function App() {
           }
         }
 
-        const tutorialChart = new Chart(
-          document.getElementById("graph"),
+        const synergyChart = new Chart(
+          document.getElementById('synergyGraph'),
           config
         );
 
-        const newCharts = [tutorialChart];
+        const newCharts = [synergyChart];
         setCurrentCharts(newCharts);
 
-      })
+      });
+  }
+
+  const getColorName = (colorLetter) => {
+    const COLORS = {
+      'W': 'White',
+      'U': 'Blue',
+      'R': 'Red',
+      'G': 'Green',
+      'B': 'Black'
+    }
+
+    return COLORS[colorLetter];
+  }
+
+  const getColorRgb = (colorLetter) => {
+    const COLORS = {
+      'W': 'rgb(255, 255, 255)',
+      'U': 'rgb(0, 0, 255)',
+      'R': 'rgb(255, 0, 0)',
+      'G': 'rgb(0, 255, 0)',
+      'B': 'rgb(0, 0, 0)'
+    }
+
+    return COLORS[colorLetter];
+  }
+
+  const displayPowerDistributionGraph = () => {
+    setCurrentGraphDisplay(graphTemplates.powerDistribution.wrapper);
+    setOnDisplay(DISPLAY_GRAPH);
+    axios.get('http://localhost:8000/colors/powerDistribution')
+      .then(response => {
+
+        currentCharts.forEach(c => {console.log(c); c.destroy()} );
+
+        const newCharts = [];
+
+        Object.keys(response.data).forEach(colorEntry => {
+          const colorName = getColorName(colorEntry);
+          
+          let powers = [];
+          let cardsPresent = [];
+          response.data[colorEntry]['power'].forEach(powerEntry => {
+            powers.push(powerEntry['power']);
+            cardsPresent.push(powerEntry['totalCards']);
+          });
+
+          const data = {
+            labels: powers,
+            datasets: [{
+              label: 'Power distribution in ' + colorName,
+              backgroundColor: getColorRgb(colorEntry),
+              borderColor: 'rgb(255, 0, 0)',
+              color: 'rgb(255, 0, 0)',
+              data: cardsPresent
+            }]
+          };
+
+          const config = {
+            type: 'bar',
+            data: data,
+            options: {
+              plugins: {
+                legend: {
+                  labels: {
+                    color: 'white',
+                    font: {
+                      size: 18
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  ticks: {
+                    color: 'white'
+                  }
+                },
+                x: {
+                  ticks: {
+                    color: 'white',
+                    font: {
+                      size: 18
+                    }
+                  }
+                }
+              }
+            }
+          };
+
+          const curChart = new Chart(
+            document.getElementById("powerGraph" + colorName),
+            config
+          );
+
+          newCharts.push(curChart);
+
+        });
+        setCurrentCharts(newCharts);
+
+      });
   }
 
   return (
@@ -342,7 +464,7 @@ function App() {
             </Slider>
             <p className="statsChoiceWrapper" hidden={radioValue !== '8'}>
               <button className="statsChoice" onClick={displayColorSynergyGraph}>Color synergy</button>
-              <button className="statsChoice">Power distribution</button>
+              <button className="statsChoice" onClick={displayPowerDistributionGraph}>Power distribution</button>
               <button className="statsChoice">Type distribution</button>
             </p>
           </div>
