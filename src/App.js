@@ -44,7 +44,17 @@ function App() {
         </div>
       </section>
     },
-    typeDistribution: {}
+    typeDistribution: {
+      wrapper: <section>
+        <div>
+          <canvas id="typeGraphWhite" width="800" height="400"></canvas>;
+          <canvas id="typeGraphBlue" width="800" height="400"></canvas>;
+          <canvas id="typeGraphBlack" width="800" height="400"></canvas>;
+          <canvas id="typeGraphRed" width="800" height="400"></canvas>;
+          <canvas id="typeGraphGreen" width="800" height="400"></canvas>;
+        </div>
+      </section>
+    }
   }
   const [currentGraphDisplay, setCurrentGraphDisplay] = useState(graphTemplates.colorSynergy.wrapper);
 
@@ -403,6 +413,82 @@ function App() {
       });
   }
 
+  const displayTypeDistributionGraph = () => {
+    setCurrentGraphDisplay(graphTemplates.typeDistribution.wrapper);
+    setOnDisplay(DISPLAY_GRAPH);
+    axios.get('http://localhost:8000/colors/typeDistribution?canon=y')
+      .then(response => {
+
+        currentCharts.forEach(c => {console.log(c); c.destroy()} );
+
+        const newCharts = [];
+
+        Object.keys(response.data).forEach(colorEntry => {
+          const colorName = getColorName(colorEntry);
+          
+          let types = [];
+          let cardsPresent = [];
+          Object.keys(response.data[colorEntry]).forEach(typeEntry => {
+            types.push(typeEntry);
+            cardsPresent.push(response.data[colorEntry][typeEntry]);
+          });
+
+          const data = {
+            labels: types,
+            datasets: [{
+              label: 'Type distribution in ' + colorName,
+              backgroundColor: getColorRgb(colorEntry),
+              borderColor: 'rgb(255, 0, 0)',
+              color: 'rgb(255, 0, 0)',
+              data: cardsPresent
+            }]
+          };
+
+          const config = {
+            type: 'bar',
+            data: data,
+            options: {
+              plugins: {
+                legend: {
+                  labels: {
+                    color: 'white',
+                    font: {
+                      size: 18
+                    }
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  ticks: {
+                    color: 'white'
+                  }
+                },
+                x: {
+                  ticks: {
+                    color: 'white',
+                    font: {
+                      size: 18
+                    }
+                  }
+                }
+              }
+            }
+          };
+
+          const curChart = new Chart(
+            document.getElementById("typeGraph" + colorName),
+            config
+          );
+
+          newCharts.push(curChart);
+
+        });
+        setCurrentCharts(newCharts);
+
+      });
+  }
+
   return (
     <ChakraProvider>
       <div className="main">
@@ -465,7 +551,7 @@ function App() {
             <p className="statsChoiceWrapper" hidden={radioValue !== '8'}>
               <button className="statsChoice" onClick={displayColorSynergyGraph}>Color synergy</button>
               <button className="statsChoice" onClick={displayPowerDistributionGraph}>Power distribution</button>
-              <button className="statsChoice">Type distribution</button>
+              <button className="statsChoice" onClick={displayTypeDistributionGraph}>Type distribution</button>
             </p>
           </div>
         </div>
