@@ -219,13 +219,14 @@ function App() {
           <div className="searchFilters">
             <RadioGroup onChange={setValue} value={radioValue}>
               <Stack direction='row'>
-                <Radio value='1'>Card Name</Radio>
+                <Radio value='1'>Name</Radio>
                 <Radio value='2'>Colors</Radio>
                 <Radio value='3'>Keyword</Radio>
                 <Radio value='4'>Power</Radio>
                 <Radio value='5'>Toughness</Radio>
-                <Radio value='6'>Above Average by color</Radio>
-                <Radio value='7'>Above Average by total cost</Radio>
+                <Radio value='6'>Above Average (color)</Radio>
+                <Radio value='7'>Above Average (mana)</Radio>
+                <Radio value='8'>Statistics</Radio>
               </Stack>
             </RadioGroup>
             <CheckboxGroup colorScheme='teal' defaultValue={[]}>
@@ -260,6 +261,11 @@ function App() {
               </SliderTrack>
               <SliderThumb >{costSlider}</SliderThumb>
             </Slider>
+            <p className="statsChoiceWrapper" hidden={radioValue !== '8'}>
+              <button className="statsChoice">Color synergy</button>
+              <button className="statsChoice">Power distribution</button>
+              <button className="statsChoice">Type distribution</button>
+            </p>
           </div>
         </div>
         <div className="queryResults">
