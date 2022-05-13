@@ -130,7 +130,7 @@ function App() {
         return <div>
           <Tooltip label={cardInfo.name}>
             <div onClick={() => loadSingleCard(cardInfo._id)} style={{cursor: 'pointer'}}>
-              <Image className="image" src={cardInfo.image_link}  />
+              <Image className="image" src={cardInfo.image_link_small}  />
             </div>
           </Tooltip>
         </div>
