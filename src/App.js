@@ -156,8 +156,8 @@ function App() {
       <Image className="selectedCardImage" src={card.image_link} />
       <h2 className="cardDisplayTitle">{card.name}</h2>
       <br />
-      <p>Name: {card.name}</p>
-      <p>Type: {card.type}</p>
+      <p><b>Name</b>: {card.name}</p>
+      <p><b>Type</b>: {card.type}</p>
       <br />
       <p>{card.oracle_text}</p>
       <br />
@@ -165,13 +165,13 @@ function App() {
         card.power === undefined ?
           ''
           :
-          <p>Power: {card.power}</p>
+          <p><b>Power</b>: {card.power}</p>
       }
       {
         card.toughness === undefined ?
           ''
           :
-          <p>Toughness: {card.toughness}</p>
+          <p><b>Toughness</b>: {card.toughness}</p>
       }
       {
         card.metrics === undefined ?
@@ -179,10 +179,10 @@ function App() {
         :
         <div>
           <br />
-          <p>Considering cards with same total mana cost and same colors:</p>
-          <p>There are {buildListSuggestion(card.metrics.more_power.equal_total_cost_and_colors)} more powerful cards you should check out.</p>
-          <p>There are {buildListSuggestion(card.metrics.more_toughness.equal_total_cost_and_colors)} tougher cards you should check out.</p>
-          <p>There are {buildListSuggestion(card.metrics.more_power_and_toughness.equal_total_cost_and_colors)} strictly better cards you should check out.</p>
+          <p><b>Suggestions:</b></p>
+          <p>{buildListSuggestion(card.metrics.more_power.equal_total_cost_and_colors)} more powerful cards. <Tooltip label="Higher power with same total mana cost">&#9432;</Tooltip></p>
+          <p>{buildListSuggestion(card.metrics.more_toughness.equal_total_cost_and_colors)} tougher cards. <Tooltip label="Higher toughness with same total mana cost">&#9432;</Tooltip></p>
+          <p>{buildListSuggestion(card.metrics.more_power_and_toughness.equal_total_cost_and_colors)} better cards. <Tooltip label="Higher power AND toughness with same total mana cost">&#9432;</Tooltip></p>
         </div>
       }
 

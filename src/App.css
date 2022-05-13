@@ -39,7 +39,7 @@
 }
 
 .cardDisplay {
-  text-align: center;
+  text-align: left;
   display: block;
   background-color: white;
   margin: 1%;
@@ -57,6 +57,7 @@
   width: 50%;
   float: left;
   margin: 2%;
+  margin-right: 4%;
 }
 
 .textCloseCardDisplay {
